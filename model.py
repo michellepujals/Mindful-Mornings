@@ -14,16 +14,44 @@ class User(db.Model):
 
     __tablename__ = "users"
 
+    def __init__(self, username, password):
+        """Create a user, given username and password."""
+
+        self.username = username
+        self.password = password
+
+
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(50), nullable=False)
     home_address = db.Column(db.String(100), nullable=True)
     destination_address = db.Column(db.String(100), nullable=True)
 
+    tasks = db.relationship('Task', backref='user')
+
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return f"<User user_id={self.user_id} username={self.username}>"
+
+
+class Task(db.Model):
+    """Tasks owned by users of Mindful Mornings website."""
+
+    __tablename__ = "tasks"
+
+    task_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"),
+                        nullable=False)
+    task_name = db.Column(db.String(50), nullable=False)
+    task_description = db.Column(db.String(100), nullable=True) # optional
+    duration_estimate = db.Column(db.Integer, nullable=False) # in minutes
+    duration_actual = db.Column(db.Integer, nullable=True) # in minutes
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return f"<Task task_id={self.task_id} task_name={self.task_name} user_id={self.user_id}>"
 
 
 
