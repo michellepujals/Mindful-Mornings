@@ -42,7 +42,7 @@ class User(db.Model):
         return cls.query.filter_by(username=username).one()
 
 
-class Settings(db.Model):
+class Setting(db.Model):
     """List of all settings."""
 
     __tablename__ = "settings"
@@ -56,10 +56,14 @@ class Settings(db.Model):
         return f"<Setting setting_id={self.setting_id} setting_name={self.setting_name}>"
 
 
-class UserSettings(db.Model):
+class UserSetting(db.Model):
     """Settings regarding user."""
+    # This is a Middle Table (meaningful)
+    # Like Comments that users can make about a book.
+    # A user has many settings. Settings can pertain to many users. 
+    # Each row's value is what a particular user has set for a particular setting.
 
-    __tablename__ = "user_settings"
+    __tablename__ = "users_settings"
 
     setting_id = db.Column(db.Integer, primary_key=True, 
                            db.ForeignKey("settings.setting_id"), 
@@ -75,7 +79,10 @@ class UserSettings(db.Model):
 
     
 class Task(db.Model):
-    """Tasks owned by users of Mindful Mornings website."""
+    """Task belonging to a user of Mindful Mornings website."""
+    # A user has many tasks. A task can be a gameplan task (special type of task).
+    # These tasks exist as ideas/blueprints. They come into play and aquire more 
+    # attributes once moved into the gameplan.
 
     __tablename__ = "tasks"
 
@@ -94,14 +101,18 @@ class Task(db.Model):
     duration_estimate = db.Column(db.Integer, nullable=False) # in minutes
     duration_actual = db.Column(db.Integer, nullable=True) # in minutes
 
+    gameplan_task = db.relationship("GameplanTask", uselist=False) # don't want a list, just one item
+
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return f"<Task task_id={self.task_id} task_name={self.task_name} user_id={self.user_id}>"
 
 
-class GameplanTask(db.Model):
+class GameplanTask(db.Model): #Twitter Employee (a special type of twitter user)
     """Task that is part of the gameplan for the morning."""
+    # Like Twitter employer/user example. Gameplan tasks are a subset of Tasks. 
+    # Can refer to current morning or the next day's morning. 
 
     __tablename__ = "gameplan"
 
@@ -118,6 +129,43 @@ class GameplanTask(db.Model):
         """Provide helpful representation when printed."""
 
         return f"<GameplanTask task_id={self.task_id} user_id={self.user_id}>"
+
+
+class Category(db.Model):
+    """Categories that tasks will belong to."""
+    # This has a many to many relationship with tasks (tasks can have many 
+    # categories and categories can have many tasks)
+    # This is to help user add 'tags' to their tasks
+    # will build more logic into this if time permits.
+    # Category ideas: must-do, optional, one-off, repeating, default, mondays
+
+    __tablename__ = "categories"
+
+    category_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    category_name = db.Column(db.String(100), nullable=False)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return f"<Category id={self.category_id} name={self.category_name}>"
+
+
+class TaskCategory(db.Model):
+    """Place to store tasks and what categories they belong to."""
+    # Just an association table. Not a meaningful middle table. 
+    # Like BookGenre table
+
+    __tablename__ = "tasks_categories"
+
+    tasks_categories_id = db.Column(db.Integer, autoincrement=true, primary_key=true)
+    task_id = db.Column(db.Integer, db.ForeignKey("tasks.task_id"), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey("categories.category_id"))
+
+    def __repr__(self):
+        """Provide helpful information when printed."""
+
+        return f"<TaskCategory id= {self.tasks_categories_id} task_id={self.task_id} category_id={self.category_id}>"
+
 
 #############################################################################
 # Helper functions
