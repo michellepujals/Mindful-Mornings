@@ -14,7 +14,6 @@ class User(db.Model):
 
     __tablename__ = "users"
 
-
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(50), nullable=False)
@@ -41,6 +40,38 @@ class User(db.Model):
         """Get a user, given their username."""
 
         return cls.query.filter_by(username=username).one()
+
+
+class Settings(db.Model):
+    """List of all settings."""
+
+    __tablename__ = "settings"
+
+    setting_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    setting_name = db.Column(db.String(100), unique=True)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return f"<Setting setting_id={self.setting_id} setting_name={self.setting_name}>"
+
+
+class UserSettings(db.Model):
+    """Settings regarding user."""
+
+    __tablename__ = "user_settings"
+
+    setting_id = db.Column(db.Integer, primary_key=True, 
+                           db.ForeignKey("settings.setting_id"), 
+                           nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"),
+                        nullable=False)
+    value = db.Column(db.String(100), nullable=False)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return f"<UserSetting setting_id={self.setting_id} user_id={self.user_id} value={self.value}>"
 
     
 class Task(db.Model):
@@ -69,6 +100,24 @@ class Task(db.Model):
         return f"<Task task_id={self.task_id} task_name={self.task_name} user_id={self.user_id}>"
 
 
+class GameplanTask(db.Model):
+    """Task that is part of the gameplan for the morning."""
+
+    __tablename__ = "gameplan"
+
+    task_id = db.Column(db.Integer, db.ForeignKey("tasks.task_id"), 
+                        primary_key=True, 
+                        nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), 
+                        nullable=False)
+    order = db.Column(db.Integer, unique=True)
+    start_time = db.Columm(db.Datetime, unique=True)
+    end_time = db.Column(db.Datetime, unique=True)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return f"<GameplanTask task_id={self.task_id} user_id={self.user_id}>"
 
 #############################################################################
 # Helper functions
