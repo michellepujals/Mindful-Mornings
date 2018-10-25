@@ -10,7 +10,7 @@ db = SQLAlchemy() # instance of SQLAlchemy, everything comes off of this object
 # Model Definitions
 
 class User(db.Model):
-    """User of Mindful Mornings website."""
+    """A user of Mindful Mornings website."""
 
     __tablename__ = "users"
 
@@ -44,6 +44,9 @@ class User(db.Model):
 
 class Setting(db.Model):
     """List of all settings."""
+    # Place to store just the names of all of the settings, not their actual values.
+    # Linked to users through the users_settings table. 
+    # A user has many settings, and settings have many users --> middle table
 
     __tablename__ = "settings"
 
@@ -57,7 +60,7 @@ class Setting(db.Model):
 
 
 class UserSetting(db.Model):
-    """Settings regarding user."""
+    """A setting that has been set by a user."""
     # This is a Middle Table (meaningful)
     # Like Comments that users can make about a book.
     # A user has many settings. Settings can pertain to many users. 
@@ -65,11 +68,11 @@ class UserSetting(db.Model):
 
     __tablename__ = "users_settings"
 
-    setting_id = db.Column(db.Integer, primary_key=True, 
-                           db.ForeignKey("settings.setting_id"), 
-                           nullable=False)
+    user_setting_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"),
                         nullable=False)
+    setting_id = db.Column(db.Integer, db.ForeignKey("settings.setting_id"),
+                           nullable=False)
     value = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
@@ -79,17 +82,16 @@ class UserSetting(db.Model):
 
     
 class Task(db.Model):
-    """Task belonging to a user of Mindful Mornings website."""
+    """A task that belongs to a user (a 'to-do')."""
     # A user has many tasks. A task can be a gameplan task (special type of task).
-    # These tasks exist as ideas/blueprints. They come into play and aquire more 
-    # attributes once moved into the gameplan.
+    # These tasks exist as things to do but don't have a set time to be done. 
+    # They get a time to be done/more attributes once moved into the gameplan.
 
     __tablename__ = "tasks"
 
-    def __init__(self, user_id, task_name, duration_estimate):
-        """Create a task, given user_id and task name."""
+    def __init__(self, task_name, duration_estimate):
+        """Create a task, given task name and duration estimate in minutes."""
 
-        self.user_id = user_id
         self.task_name = task_name
         self.duration_estimate = duration_estimate
 
@@ -111,10 +113,10 @@ class Task(db.Model):
 
 class GameplanTask(db.Model): #Twitter Employee (a special type of twitter user)
     """Task that is part of the gameplan for the morning."""
-    # Like Twitter employer/user example. Gameplan tasks are a subset of Tasks. 
-    # Can refer to current morning or the next day's morning. 
+    # A gameplan task is a special type of task. One to one relationship
+    # Can refer to current morning or the next day's morning (depending on what time it is currently). 
 
-    __tablename__ = "gameplan"
+    __tablename__ = "gameplan_tasks"
 
     task_id = db.Column(db.Integer, db.ForeignKey("tasks.task_id"), 
                         primary_key=True, 
@@ -122,8 +124,8 @@ class GameplanTask(db.Model): #Twitter Employee (a special type of twitter user)
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), 
                         nullable=False)
     order = db.Column(db.Integer, unique=True)
-    start_time = db.Columm(db.Datetime, unique=True)
-    end_time = db.Column(db.Datetime, unique=True)
+    start_time = db.Column(db.DateTime, unique=True)
+    end_time = db.Column(db.DateTime, unique=True)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -132,16 +134,17 @@ class GameplanTask(db.Model): #Twitter Employee (a special type of twitter user)
 
 
 class Category(db.Model):
-    """Categories that tasks will belong to."""
+    """Categories that tasks belong to."""
     # This has a many to many relationship with tasks (tasks can have many 
-    # categories and categories can have many tasks)
-    # This is to help user add 'tags' to their tasks
-    # will build more logic into this if time permits.
-    # Category ideas: must-do, optional, one-off, repeating, default, mondays
+    # categories and categories can have many tasks).
+    # This is to help user add 'tags' to their tasks.
+    # Will build more logic into this if time permits. (class methods)
+    # Category ideas: must-do, optional, one-off, repeating, default, mondays, etc.
 
     __tablename__ = "categories"
 
-    category_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    category_id = db.Column(db.Integer, autoincrement=True,
+                            primary_key=True, nullable=False)
     category_name = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
@@ -150,14 +153,16 @@ class Category(db.Model):
         return f"<Category id={self.category_id} name={self.category_name}>"
 
 
-class TaskCategory(db.Model):
+class TaskCategory(db.Model): # Like BookGenre table
     """Place to store tasks and what categories they belong to."""
     # Just an association table. Not a meaningful middle table. 
-    # Like BookGenre table
+    # A task belongs to a category. It can belong to multiple categories. 
+    # A category can have many tasks. 
+    # Each row is just a combo of a task (task_id) and a category (category_id).
 
     __tablename__ = "tasks_categories"
 
-    tasks_categories_id = db.Column(db.Integer, autoincrement=true, primary_key=true)
+    tasks_categories_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     task_id = db.Column(db.Integer, db.ForeignKey("tasks.task_id"), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey("categories.category_id"))
 
