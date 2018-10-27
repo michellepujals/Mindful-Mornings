@@ -23,7 +23,7 @@ app.jinja_env.undefined = StrictUndefined # Raises error for undefined vars
 
 @app.route("/")
 def index():
-    """Homepage.""" 
+    """Show homepage.""" 
 
     return render_template("homepage.html")
 
@@ -35,12 +35,15 @@ def display_registration_form():
     return render_template("registration_form.html")
 
 
-@app.route("register", methods=["POST"])
+@app.route("/register", methods=["POST"])
 def execute_user_registration():
-    """Adds new user to database."""
+    """Add new user to database using info provided in registration form."""
+    # this is a dictionary . get request, does not return error if nothing there
+    # will return None. ** Find out how to make 2 of these fields mandatory
 
     username = request.form.get("username")
     password = request.form.get("password")
+    # control through JS/HTML
     default_home_address = request.form.get("default_home_address")
     default_destination_address = request.form.get("default_destination_address")
 
@@ -74,6 +77,13 @@ def check_login_credentials():
             session['user'] = user.user_id # adds user to the session
             flash("You are now logged in.")
             return redirect(f"/{username}/dashboard")  # create dashboard route later (includes task vault, gameplan, and maps API)
+        else:
+            flash("Incorrect login information. Please try again.")
+            return redirect("/login")
+
+    return render_template("login.html", username=username, password=password,
+                            user=user)
+
 
 @app.route("/logout")
 def log_out_user():
@@ -85,41 +95,69 @@ def log_out_user():
     return redirect("/")
 
 
-@app.route("/tasks")
+@app.route("api/tasks", methods=["GET"])
 def task_list():
-    """Show list of tasks.""" # this is going to be the task vault, all tasks
+    """Show list of tasks.""" # this is going to be the task vault, all task objects
 
-    tasks = Task.query.all()
-    return render_template("task_list.html")
+    user_id = session['user']  # get the user_id from the session dictionary
+    tasks = Task.query.filter_by(user_id=user_id).all()  # get list of user's task objects
+
+    # may need to figure out what to get out of the task objects to display
+
+    return render_template("task_list.html", tasks=tasks)
 
 
-@app.route("/add_new_task")
+@app.route("/api/task", methods=["POST"])
 def add_new_task():
     """Add a new task to user's task list."""
 
-##### finish this one 
+    user_id = session['user']  # get the user_id from the session dictionary
+    task_name = request.form.get(task_name=task_name)  # get from the form user fills out
+    duration_estimate = request.form.get(duration_estimate=duration_estimate)  # get from form
+    new_task = Task(user_id=user_id, task_name=task_name, 
+                    duration_estimate=duration_estimate)  # instantiate a Task object
+
+    db.session.add(new_task)  # add new task object to user's list of tasks (tasks table)
+    db.session.commit()
+
+    return redirect ("/dashboard")  # go back to dashboard
 
 
-@app.route("/<username>/settings")
+@app.route("/api/task/<task_id>", methods=["DELETE"])
+def delete_task_from_task_list():
+    """Delete a task from user's task list."""
+
+    user_id = session['user']  # get the user_id from the session dictionary
+    ### finish this one
+
+
+@app.route("/settings")
 def show_user_settings():
     """Show user's settings."""
 
     user_id = session['user'] # get the user_id from the session dictionary
     user = User.query.get(user_id) # use the user_id to get the user object
     username = user.username # get the username from the user object
-    user_settings = UserSetting.query.filter_by(user_id=user_id).all()
+    user_settings = UserSetting.query.filter_by(user_id=user_id).all() # list of setting objects
 
     return render_template("user_settings.html", username=username, 
                             user_settings=user_settings)
 
-@app.route("update_user_settings")
-def update_user_settings():
-    """Update settings for a user."""
+@app.route("/api/setting/<name>", methods=['PUT'])
+def update_user_setting():
+    """Update a setting for a user."""
 
-#### finish this one
+    user_id = session['user'] # get the user_id from the session dictionary
+    username = user.username # get the username from the user object
+    new_value_user_setting = request.form.get(value=value)  # get from form
+    user_setting = UserSetting.query.filter_by(user_setting_id=user_setting_id).one() # get the user setting object
+    user_setting.value = new_value_user_setting  # update setting with new value
 
+    db.session.commit()
 
-@app.route("/<username>/gameplan")
+    return redirect("/dashboard")
+
+@app.route("/gameplan", methods=["GET"])
 def show_user_gameplan():
     """Show user's morning gameplan."""
 
@@ -132,11 +170,36 @@ def show_user_gameplan():
                             gameplan_tasks=gameplan_tasks)
 
 
-@app.route("/update_gameplan")
+@app.route("/gameplan", methods=["POST"])
 def update_gameplan():
     """Update user's gameplan."""
+    # commits all information in gameplan into the gameplan table so user can 
+    # access it next time logs in
 
-##### finish this one
+    user_id = session['user']
+    user = User.query.get(user_id)
+    gameplan_tasks = user.gameplan  # list of gameplan task objects
+
+    db.session.add_all(gameplan_tasks)
+    db.session.commit()
+
+    return redirect("/dashboard")
+
+
+@app.route("/about")
+def display_about_page():
+    """Display about page."""
+
+    return render_template("about.html")
+
+
+## Some of these routes will need to be changed to JSON using jsonify
+
+
+
+
+
+
 
 
 
