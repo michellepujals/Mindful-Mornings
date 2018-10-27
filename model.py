@@ -20,7 +20,11 @@ class User(db.Model):
     home_address = db.Column(db.String(100), nullable=True)
     destination_address = db.Column(db.String(100), nullable=True)
 
-    tasks = db.relationship('Task', backref='user')
+    tasks = db.relationship("Task", backref='user')
+
+    gameplan = db.relationship("GameplanTask", backref='user')
+    # this way, can do gameplan_task.user to get the user object, 
+    # then get user_id from this
 
     def __init__(self, username, password):
         """Create a user, given username and password."""
@@ -82,18 +86,12 @@ class UserSetting(db.Model):
 
     
 class Task(db.Model):
-    """A task that belongs to a user (a 'to-do')."""
+    """A task that belongs to a user (a theoretical 'to-do')."""
     # A user has many tasks. A task can be a gameplan task (special type of task).
     # These tasks exist as things to do but don't have a set time to be done. 
     # They get a time to be done/more attributes once moved into the gameplan.
 
     __tablename__ = "tasks"
-
-    def __init__(self, task_name, duration_estimate):
-        """Create a task, given task name and duration estimate in minutes."""
-
-        self.task_name = task_name
-        self.duration_estimate = duration_estimate
 
     task_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"),
@@ -103,12 +101,25 @@ class Task(db.Model):
     duration_estimate = db.Column(db.Integer, nullable=False) # in minutes
     duration_actual = db.Column(db.Integer, nullable=True) # in minutes
 
-    gameplan_task = db.relationship("GameplanTask", uselist=False) # don't want a list, just one item
+    gameplan_task = db.relationship("GameplanTask", uselist=False, # don't want a list, just one item
+                                    backref="task") 
+    # this is how to get the Gameplan Task object (which has more attributes)
+
+    def __init__(self, task_name, duration_estimate):
+        """Create a task, given task name and duration estimate in minutes."""
+
+        self.task_name = task_name
+        self.duration_estimate = duration_estimate
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return f"<Task task_id={self.task_id} task_name={self.task_name} user_id={self.user_id}>"
+
+    @property
+    def order(self):
+        return self.gameplan_task.order or None  # get the order of the task?
+    
 
 
 class GameplanTask(db.Model): #Twitter Employee (a special type of twitter user)
@@ -126,6 +137,8 @@ class GameplanTask(db.Model): #Twitter Employee (a special type of twitter user)
     order = db.Column(db.Integer, unique=True)
     start_time = db.Column(db.DateTime, unique=True)
     end_time = db.Column(db.DateTime, unique=True)
+    
+    # can access with user.gameplan (due to the backref)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
