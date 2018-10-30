@@ -1,6 +1,12 @@
 {% extends "base.html" %}
+
+{% block title %}Welcome to Mindful Mornings!{% endblock %}
+
 {% block content %}
 
-Welcome to Mindful Mornings!
+    <div class="row">
+        <h2>Welcome, {{username}}!</h2>
+        <p>Let's set your intention for this morning.</p>
+    </div>
 
 {% endblock %}

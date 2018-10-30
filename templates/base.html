@@ -1,30 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Mindful Mornings</title>
+    <title>{% block title %}TITLE HERE{% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link href="/static/css/stylesheet.css">  
 </head>
 <body>
-    Mindful Mornings
-
-{% if "user_id" in session %}
-    <div display: inline-block>
-        <form action="/">
-            <input type="submit" name="loggedOut" value="Log Out">
-        </form>
-    </div>
-
-{% else %}
-    <div display: inline-block>
-        <form action="/login">
-            <input type="submit" name="loggedIn" value="Log In">
-        </form>
-    </div>
-{% endif %}
-    <div class="flashes">
+<div class="container">
+    <h1>
+        <a href="/">Mindful Mornings</a>
+    </h1>
+        <p>Elevate your morning routine</p>
         {% for message in get_flashed_messages() %}
-            {{ message }}
+        <div class="flashes">{{ message }}</div>
         {% endfor %}
-    </div>
-    {% block content %} {% endblock %}
+
+    {% block content %}CONTENT HERE{% endblock %}
+</div>
 </body>
 </html>

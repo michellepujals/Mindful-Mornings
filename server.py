@@ -20,12 +20,21 @@ app.jinja_env.undefined = StrictUndefined # Raises error for undefined vars
 ## Routes here #############################################################
 
 # use a lot of RESTful API stuff here (mostly single-page app, will use AJAX/React)
+# /api/ is for React
 
 @app.route("/")
 def index():
     """Show homepage.""" 
+    user_id = session['user']
+    if user_id:
+        user = User.query.get(user_id)
 
-    return render_template("homepage.html")
+        if user:
+            username = user.username
+    else:
+        username = "friend"
+
+    return render_template("homepage.html", username=username)
 
 
 @app.route("/register", methods=["GET"])
@@ -76,7 +85,7 @@ def check_login_credentials():
         if user.password == password:  # check if the password is the same
             session['user'] = user.user_id # adds user to the session
             flash("You are now logged in.")
-            return redirect(f"/{username}/dashboard")  # create dashboard route later (includes task vault, gameplan, and maps API)
+            return redirect("/dashboard")  # create dashboard route later (includes task vault, gameplan, and maps API)
         else:
             flash("Incorrect login information. Please try again.")
             return redirect("/login")
@@ -95,7 +104,7 @@ def log_out_user():
     return redirect("/")
 
 
-@app.route("api/tasks", methods=["GET"])
+@app.route("/api/tasks", methods=["GET"])
 def task_list():
     """Show list of tasks.""" # this is going to be the task vault, all task objects
 
@@ -127,8 +136,12 @@ def add_new_task():
 def delete_task_from_task_list():
     """Delete a task from user's task list."""
 
-    user_id = session['user']  # get the user_id from the session dictionary
-    ### finish this one
+    task_id = request.form.get(task_id=task_id)  # get task_id from form
+    task_to_delete = Task.query.get(task_id)  # get the task object to delete
+    db.session.delete(task_to_delete)  # delete from database/task table
+    db.session.commit() 
+
+    return redirect ("/dashboard")  # go back to dashboard
 
 
 @app.route("/settings")
@@ -170,18 +183,26 @@ def show_user_gameplan():
                             gameplan_tasks=gameplan_tasks)
 
 
-@app.route("/gameplan", methods=["POST"])
+@app.route("/gameplan", methods=["DELETE","POST"])
 def update_gameplan():
     """Update user's gameplan."""
-    # commits all information in gameplan into the gameplan table so user can 
-    # access it next time logs in
+    # First clears out the current gameplan tasks for that user.
+    # Then commits all information in gameplan into the gameplan table 
+    # so user can access it next time logs in.
 
-    user_id = session['user']
-    user = User.query.get(user_id)
-    gameplan_tasks = user.gameplan  # list of gameplan task objects
+    user_id = session['user']  # get the user_id from the session
+    user = User.query.get(user_id)  # get the user object
+    gameplan_tasks = user.gameplan # get the list of gameplan tasks for user
+    for item in gameplan_tasks:  # loop through each task in the list
+        db.session.delete(item)  # delete that task
+    db.session.commit()  # commit changes
+    
+    #** Somehow get all the gameplan task objects that are in gameplan area
+    # and add them to a list, call it new_gameplan
 
-    db.session.add_all(gameplan_tasks)
-    db.session.commit()
+    for item in new_gameplan:  # loop through each item in the list
+        db.session.add(item)  # add that item
+    db.session.commit() # commit changes
 
     return redirect("/dashboard")
 
@@ -192,6 +213,21 @@ def display_about_page():
 
     return render_template("about.html")
 
+
+if __name__ == "__main__":
+    # set debug to true since it has to be true at the point
+    # where we invoke the DebugToolbarExtension
+    app.debug = True 
+                   
+    # make sure templates, etc. are not cached in debug mode
+    app.jinja_env.auto_reload = app.debug
+
+    connect_to_db(app)
+
+    # Use the debug toolbar
+    DebugToolbarExtension(app)
+
+    app.run(port=5000, host='0.0.0.0')
 
 ## Some of these routes will need to be changed to JSON using jsonify
 
