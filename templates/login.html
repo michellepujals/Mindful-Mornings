@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Login/Logout{% endblock %}
+
+{% block content %}
+
+{% if not session['user'] %}
+
+Please log in:
+
+    <form action="/login" method="POST">
+        Username: <input type="text" name="username">
+        Password: <input type="text" name="password">
+        <input type="submit" value="Log In">
+    </form>
+
+{% else %}
+
+Logout here:
+
+    <form action="/logout">
+        <input type="submit" value="Log Out">
+    </form>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Task List{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <h2>Welcome</h2>
+        <p>Elevate your morning routine</p>
+    </div>
+
+    <div class="col-xs-12 col-md-8">
+        {% if "user_id" in session %}
+            <div display: inline-block>
+                <form action="/">
+                <input type="submit" name="loggedOut" value="Log Out">
+                </form>
+            </div>
+
+        {% else %}
+            <div display: inline-block>
+                <form action="/login">
+                    <input type="submit" name="loggedIn" value="Log In">
+                </form>
+            </div>
+        {% endif %}
+
+{% endblock %}

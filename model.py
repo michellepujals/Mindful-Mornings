@@ -86,7 +86,7 @@ class UserSetting(db.Model):
 
     
 class Task(db.Model):
-    """A task that belongs to a user (a theoretical 'to-do')."""
+    """A task that belongs to a user (a theoretical 'to-do' blueprint)."""
     # A user has many tasks. A task can be a gameplan task (special type of task).
     # These tasks exist as things to do but don't have a set time to be done. 
     # They get a time to be done/more attributes once moved into the gameplan.
@@ -118,7 +118,7 @@ class Task(db.Model):
 
     @property
     def order(self):
-        return self.gameplan_task.order or None  # get the order of the task?
+        return self.gameplan_task.order or None  # get the order of the task easily
     
 
 
@@ -198,7 +198,7 @@ def connect_to_db(app):
     db.init_app(app)
 
 if __name__ == "__main__":
-    # Running this file interactively allows direct interaction w/ database."""
+    # Running this file interactively allows direct interaction w/ database.
 
     from server import app
     connect_to_db(app)
