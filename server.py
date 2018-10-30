@@ -1,21 +1,16 @@
-"""File that deals with server."""
+"""File that deals with server for Mindful Mornings site."""
 
 from jinja2 import StrictUndefined
-
 from flask import (Flask, render_template, redirect, request, flash, 
                     session, Markup)
-
 from flask_debugtoolbar import DebugToolbarExtension
-
-from model import * 
-
+from model import *  # import everything from model.py
 
 app = Flask(__name__) # this is the instance of the flask application
 
 app.secret_key = "ABC" # Required to use Flask sessions and debug toolbar
 
 app.jinja_env.undefined = StrictUndefined # Raises error for undefined vars
-
 
 ## Routes here #############################################################
 
@@ -32,7 +27,7 @@ def index():
         if user:
             username = user.username
     else:
-        username = "friend"
+        username = "friend"   # Welcome person even if they are not logged in 
 
     return render_template("homepage.html", username=username)
 
