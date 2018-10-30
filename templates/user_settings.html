@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <h2>Welcome</h2>
+        <p>Elevate your morning routine</p>
+    </div>
+
+    <h2>Settings</h2>
+    <table class="table">
+        <thead>
+        <th>Setting Name</th>
+        <th>Value</th>
+        </thead>
+    <tbody>
+    {% for user_setting in user_settings %}
+      <tr>
+        <td>{{ user_setting.name }}</td>
+        <td>{{ user_setting.value }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}
