@@ -61,13 +61,6 @@ def execute_user_registration():
     return redirect('/')
 
 
-@app.route("/login", methods=["GET"])
-def display_login_page():
-    """Display login page."""
-
-    return render_template("login.html")
-
-
 @app.route("/login", methods=["POST"])
 def check_login_credentials():
     """Check user email and password against the database, login user."""
@@ -80,12 +73,12 @@ def check_login_credentials():
         if user.password == password:  # check if the password is the same
             session['user'] = user.user_id # adds user to the session
             flash("You are now logged in.")
-            return redirect("/dashboard")  # create dashboard route later (includes task vault, gameplan, and maps API)
+            return redirect("/")
         else:
             flash("Incorrect login information. Please try again.")
-            return redirect("/login")
+            return redirect("/")
 
-    return render_template("login.html", username=username, password=password,
+    return render_template("homepage.html", username=username, password=password,
                             user=user)
 
 
@@ -108,7 +101,7 @@ def task_list():
 
     # may need to figure out what to get out of the task objects to display
 
-    return render_template("task_list.html", tasks=tasks)
+    return render_template("dashboard.html", tasks=tasks)
 
 
 @app.route("/api/task", methods=["POST"])
@@ -174,7 +167,7 @@ def show_user_gameplan():
     username = user.username # get the username from the user object
     gameplan_tasks = GameplanTask.query.filter_by(username=username).all()
 
-    return render_template("user_gameplan.html", username=username,
+    return render_template("dashboard.html", username=username,
                             gameplan_tasks=gameplan_tasks)
 
 
