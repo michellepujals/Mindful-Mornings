@@ -1,5 +1,6 @@
 """Models and database functions for for Mindful Mornings project."""
 
+import flask_login
 from flask_sqlalchemy import SQLAlchemy # connection to PostgreSql database
 # getting this from the Flask-SQLAlchemy helper library
 # On this, session object, where most interactions occur (committing, etc.)
@@ -9,7 +10,7 @@ db = SQLAlchemy() # instance of SQLAlchemy, everything comes off of this object
 #############################################################################
 # Model Definitions
 
-class User(db.Model):
+class User(flask_login.UserMixin, db.Model):
     """A user of Mindful Mornings website."""
 
     __tablename__ = "users"
