@@ -18,7 +18,7 @@
     <tbody>
     {% for user_setting in user_settings %}
       <tr>
-        <td>{{ user_setting.name }}</td>
+        <td>{{ user_setting.setting.setting_name }}</td>
         <td>{{ user_setting.value }}</td>
       </tr>
     {% endfor %}

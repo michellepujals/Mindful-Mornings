@@ -10,7 +10,7 @@ db = SQLAlchemy() # instance of SQLAlchemy, everything comes off of this object
 #############################################################################
 # Model Definitions
 
-class User(flask_login.UserMixin, db.Model):
+class User(db.Model): # add in flask_login.UserMixin later (2nd sprint)
     """A user of Mindful Mornings website."""
 
     __tablename__ = "users"
@@ -18,14 +18,18 @@ class User(flask_login.UserMixin, db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(50), nullable=False)
-    home_address = db.Column(db.String(100), nullable=True)
-    destination_address = db.Column(db.String(100), nullable=True)
 
     tasks = db.relationship("Task", backref='user')
+    # user.tasks returns list of tasks 
+    # this way, can do tasks.user to get the user object
 
     gameplan = db.relationship("GameplanTask", backref='user')
-    # this way, can do gameplan_task.user to get the user object, 
-    # then get user_id from this
+    # user.gameplan returns list of gameplan tasks
+    # this way, can do gameplan_task.user to get the user object
+
+    settings = db.relationship("UserSetting") # go to UserSetting to see other one
+    # user.settings returns list of users's settings
+
 
     def __init__(self, username, password):
         """Create a user, given username and password."""
@@ -58,6 +62,9 @@ class Setting(db.Model):
     setting_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     setting_name = db.Column(db.String(100), unique=True)
 
+    users_settings = db.relationship("UserSetting")
+    # setting.users_settings returns a list of the users' settings for that setting
+
     def __repr__(self):
         """Provide helpful representation when printed."""
 
@@ -79,6 +86,9 @@ class UserSetting(db.Model):
     setting_id = db.Column(db.Integer, db.ForeignKey("settings.setting_id"),
                            nullable=False)
     value = db.Column(db.String(100), nullable=False)
+
+    user = db.relationship("User") # usersetting.user returns the user object
+    setting = db.relationship("Setting") # usersetting.setting returns the setting object
 
     def __repr__(self):
         """Provide helpful representation when printed."""
