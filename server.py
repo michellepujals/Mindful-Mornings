@@ -1,5 +1,6 @@
 """File that deals with server for Mindful Mornings site."""
 
+import flask_login 
 from jinja2 import StrictUndefined
 from flask import (Flask, render_template, redirect, request, flash, 
                     session, Markup)
@@ -11,6 +12,9 @@ app = Flask(__name__) # this is the instance of the flask application
 app.secret_key = "ABC" # Required to use Flask sessions and debug toolbar
 
 app.jinja_env.undefined = StrictUndefined # Raises error for undefined vars
+
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
 
 ## Routes here #############################################################
 
@@ -60,23 +64,68 @@ def execute_user_registration():
 
     return redirect('/')
 
+####### Flask-login callbacks ################################################
+# ** From flask-login documentation---> need to decide which one to use***
+# Tell Flask-login how to load a user from a Flask request and from session
+
+@login_manager.user_loader
+def user_loader():
+
+    username = request.form.get("username") # get username from form
+    password = request.form.get("password") # get password from form
+    users = User.query.all() # gets all user objects in a list
+
+    if username not in users:
+        return
+        
+    user = User.query.filter_by(username=username).one() # queries the db for the user object
+    return user
+
+
+@login_manager.request_loader
+def request_loader(request):
+
+    username = request.form.get("username") # get username from form
+    password = request.form.get("password") # get password from form
+    users = User.query.all() # gets all user objects in a list
+
+    if username not in users: # returns none if user does not exist
+        return
+
+    user = User.query.filter_by(username=username).one() # queries the db for the user object
+    user.is_authenticated = password == user.password
+
+    return user
+
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    return 'Unauthorized'
+
+
+############# Views, etc. ######################################################
+
 
 @app.route("/login", methods=["POST"])
 def check_login_credentials():
-    """Check user email and password against the database, login user."""
+    """Check user email and password against the database, add user to session."""
 
     username = request.form.get("username") # get username from form
-    password = request.form.get("password") # get username from form
+    password = request.form.get("password") # get password from form
     user = User.query.filter_by(username=username).one() # queries the db for the user object
 
-    if (user.username and user.password):  # if the user already has a username and password
+    if user:  # if the user exists (if that username exists)
         if user.password == password:  # check if the password is the same
             session['user'] = user.user_id # adds user to the session
+            flask_login.login_user(user) # flask-login specific method call
             flash("You are now logged in.")
             return redirect("/")
         else:
             flash("Incorrect login information. Please try again.")
             return redirect("/")
+
+    elif not user:
+        flash("Your username does not exist. Please try again or register as a new user.")
+        return redirect("/")
 
     return render_template("homepage.html", username=username, password=password,
                             user=user)
@@ -87,14 +136,16 @@ def log_out_user():
     """Log user out."""
 
     session['user'] = None  # clears the user's data from the session
+    flask_login.logout_user() # Flask-login specific method call
     flash("You are now logged out.")
 
     return redirect("/")
 
 
 @app.route("/api/tasks", methods=["GET"])
+@flask_login.login_required  # flask-login specific method call
 def task_list():
-    """Show list of tasks.""" # this is going to be the task vault, all task objects
+    """Show list of tasks.""" # All task objects for this user
 
     user_id = session['user']  # get the user_id from the session dictionary
     tasks = Task.query.filter_by(user_id=user_id).all()  # get list of user's task objects
@@ -105,6 +156,7 @@ def task_list():
 
 
 @app.route("/api/task", methods=["POST"])
+@flask_login.login_required  # flask-login specific method call
 def add_new_task():
     """Add a new task to user's task list."""
 
@@ -121,6 +173,7 @@ def add_new_task():
 
 
 @app.route("/api/task/<task_id>", methods=["DELETE"])
+@flask_login.login_required  # flask-login specific method call
 def delete_task_from_task_list():
     """Delete a task from user's task list."""
 
@@ -133,6 +186,7 @@ def delete_task_from_task_list():
 
 
 @app.route("/settings")
+@flask_login.login_required  # flask-login specific method call
 def show_user_settings():
     """Show user's settings."""
 
@@ -145,6 +199,7 @@ def show_user_settings():
                             user_settings=user_settings)
 
 @app.route("/api/setting/<name>", methods=['PUT'])
+@flask_login.login_required  # flask-login specific method call
 def update_user_setting():
     """Update a setting for a user."""
 
@@ -159,6 +214,7 @@ def update_user_setting():
     return redirect("/dashboard")
 
 @app.route("/gameplan", methods=["GET"])
+@flask_login.login_required  # flask-login specific method call
 def show_user_gameplan():
     """Show user's morning gameplan."""
 
@@ -172,6 +228,7 @@ def show_user_gameplan():
 
 
 @app.route("/gameplan", methods=["DELETE","POST"])
+@flask_login.login_required  # flask-login specific method call
 def update_gameplan():
     """Update user's gameplan."""
     # First clears out the current gameplan tasks for that user.
