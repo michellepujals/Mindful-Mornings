@@ -9,20 +9,24 @@
         <p>Elevate your morning routine</p>
     </div>
 
-    <div class="col-xs-12 col-md-8">
-        {% if "user_id" in session %}
-            <div display: inline-block>
-                <form action="/">
-                <input type="submit" name="loggedOut" value="Log Out">
-                </form>
-            </div>
+    <h2>Please choose a username and password to register</h2>
+        <form method="POST" action="/register">
+          <div class="form-group">
+            <label for="field-username">Username</label>
+            <input id="field-name" class="form-control" type="text" name="username" required>
+          </div>
+          <div class="form-group">
+            <label for="field-password">Password</label>
+            <input id="field-password" class="form-control" type="password" name="password" required>
+          </div>
+          <div class="form-group">
+            <label for="field-email">Confirm Password</label>
+            <input id="field-confirm-password" class="form-control" type="password" name="confirm_password" required>
+          </div>
+          <div class="form-group">
+            <input type="submit" value="Register" class="btn btn-primary">
+          </div>
+        </form>
 
-        {% else %}
-            <div display: inline-block>
-                <form action="/login">
-                    <input type="submit" name="loggedIn" value="Log In">
-                </form>
-            </div>
-        {% endif %}
 
 {% endblock %}
