@@ -54,9 +54,20 @@ def execute_user_registration():
         return redirect ("/register")
 
     user = User(username=username, password=password)
-
     db.session.add(user)
     db.session.commit()
+
+    user_id = user.user_id # get new user's user_id (automatically generated)
+
+    settings = Setting.query.all() # list of all settings objects
+
+    for setting in settings: # going from Settings object to UserSetting object
+        new_user_setting = UserSetting(user_id=user_id, 
+                                       setting_id=setting.setting_id,
+                                       value=setting.setting_default_value)
+        db.session.add(new_user_setting)
+        db.session.commit()
+
     flash("Thank you for registering! Now please login with your credentials.")
 
     return redirect('/')
@@ -139,7 +150,7 @@ def delete_task_from_task_list():
     return redirect ("/dashboard")  # go back to dashboard
 
 
-@app.route("/settings")
+@app.route("/settings", methods=["GET"])
 def show_user_settings():
     """Show user's settings."""
 
@@ -147,11 +158,13 @@ def show_user_settings():
         user_id = session['user'] # get the user_id from the session dictionary
         user = User.query.get(user_id) # use the user_id to get the user object
         username = user.username # get the username from the user object
+        general_settings = Setting.query.all() # gets list of all possible settings objects
         user_settings = UserSetting.query.filter_by(user_id=user_id).all() # list of setting objects
     else:
         return redirect("/")
 
     return render_template("user_settings.html", username=username, 
+                            general_settings=general_settings, 
                             user_settings=user_settings)
 
 @app.route("/api/setting/<name>", methods=['PUT'])

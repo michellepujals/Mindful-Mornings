@@ -61,6 +61,7 @@ class Setting(db.Model):
 
     setting_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     setting_name = db.Column(db.String(100), unique=True)
+    setting_default_value = db.Column(db.String(100))
 
     users_settings = db.relationship("UserSetting")
     # setting.users_settings returns a list of the users' settings for that setting
