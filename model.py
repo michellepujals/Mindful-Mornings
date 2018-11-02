@@ -117,9 +117,9 @@ class Task(db.Model):
                                     backref="task") 
     # this is how to get the Gameplan Task object (which has more attributes)
 
-    def __init__(self, task_name, duration_estimate):
+    def __init__(self, user_id, task_name, duration_estimate):
         """Create a task, given task name and duration estimate in minutes."""
-
+        self.user_id = user_id
         self.task_name = task_name
         self.duration_estimate = duration_estimate
 
@@ -147,8 +147,8 @@ class GameplanTask(db.Model): #Twitter Employee (a special type of twitter user)
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), 
                         nullable=False)
     order = db.Column(db.Integer, unique=True)
-    start_time = db.Column(db.DateTime, unique=True)
-    end_time = db.Column(db.DateTime, unique=True)
+    start_time = db.Column(db.Time, unique=True)
+    end_time = db.Column(db.Time, unique=True)
     
     # can access with user.gameplan (due to the backref)
 
