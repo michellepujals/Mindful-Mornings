@@ -158,13 +158,11 @@ def show_user_settings():
         user_id = session['user'] # get the user_id from the session dictionary
         user = User.query.get(user_id) # use the user_id to get the user object
         username = user.username # get the username from the user object
-        general_settings = Setting.query.all() # gets list of all possible settings objects
         user_settings = UserSetting.query.filter_by(user_id=user_id).all() # list of setting objects
     else:
         return redirect("/")
 
     return render_template("user_settings.html", username=username, 
-                            general_settings=general_settings, 
                             user_settings=user_settings)
 
 @app.route("/api/setting/<name>", methods=['PUT'])
@@ -179,19 +177,20 @@ def update_user_setting():
 
     db.session.commit()
 
-    return redirect("/dashboard")
+    return redirect("/settings")
 
-@app.route("/gameplan", methods=["GET"])
+@app.route("/dashboard", methods=["GET"])
 def show_user_gameplan():
     """Show user's morning gameplan."""
 
     user_id = session['user'] # get the user_id from the session dictionary
     user = User.query.get(user_id) # use the user_id to get the user object
     username = user.username # get the username from the user object
-    gameplan_tasks = GameplanTask.query.filter_by(username=username).all()
+    gameplan_tasks = GameplanTask.query.filter_by(user_id=user_id).all()
+    tasks = Task.query.filter_by(user_id=user_id).all()
 
     return render_template("dashboard.html", username=username,
-                            gameplan_tasks=gameplan_tasks)
+                            gameplan_tasks=gameplan_tasks, tasks=tasks)
 
 
 @app.route("/gameplan", methods=["DELETE","POST"])
