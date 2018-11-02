@@ -29,7 +29,20 @@
                 {% endfor %}
                 </tbody>
             </table>
-            <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
+            <p>Create a task template here:</p>
+        <form method="POST" action="/api/task">
+          <div class="form-group">
+            <label for="field-task_name">Task name</label>
+            <input id="task_name" class="form-control" type="text" name="task_name" required>
+          </div>
+          <div class="form-group">
+            <label for="field-duration_estimate">Duration estimate (in minutes)</label>
+            <input id="field-duration_estimate" class="form-control" type="text" name="duration_estimate" required>
+          </div>
+          <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-primary">
+          </div>
+        </form>
           </div>
           <div class="col-md-4">
             <h2>Gameplan</h2>
@@ -43,19 +56,43 @@
                 <tbody>
                 {% for gameplan_task in gameplan_tasks %}
                     <tr>
-                    <td>{{ gameplan_task.task_name }}</td>
+                    <td>{{ gameplan_task.task.task_name }}</td>
                     <td>{{ gameplan_task.start_time }}</td>
                     <td>{{ gameplan_task.end_time}}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
-            <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
+            <p>Choose existing template to add to your Gameplan:</p>
+            <form method="POST" action="/api/add_task_to_gameplan">
+                <div class="form-group">
+                    <label for="field-task_name">Task name</label>
+                            <select name="gameplan_task_name">
+                                {% for task in tasks %}
+                                <option id="gameplan_task_name" value="{{ task.task_id }}">{{ task.task_name }}</option>
+                                {% endfor %}
+                            </select>
+                </div>
+                <div class="form-group">
+                    <label for="field-start_time">Start time</label>
+                    <input id="field-start_time" class="form-control" type="time" min="0:00" max="12:00" name="start_time" required>
+                </div>
+                <div class="form-group">
+                    <label for="field-end_time">End time</label>
+                    <input id="field-end_time" class="form-control" type="time" type="time" min="0:00" max="12:00" name="end_time" required>
+                </div>
+                <div class="form-group">
+                    <label for="field-order">Order</label>
+                    <input id="order" class="form-control" type="text" name="order" required>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary">
+                </div>
+            </form>
           </div>
           <div class="col-md-4">
             <h2>Google Maps</h2>
             <p>Google maps API will appear here.</p>
-            <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
           </div>
         </div>
 
