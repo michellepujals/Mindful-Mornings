@@ -10,7 +10,7 @@ db = SQLAlchemy() # instance of SQLAlchemy, everything comes off of this object
 #############################################################################
 # Model Definitions
 
-class User(db.Model): # add in flask_login.UserMixin later (2nd sprint)
+class User(db.Model):
     """A user of Mindful Mornings website."""
 
     __tablename__ = "users"
