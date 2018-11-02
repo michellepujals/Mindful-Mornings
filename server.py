@@ -127,8 +127,8 @@ def add_new_task():
     """Add a new task to user's task list."""
 
     user_id = session['user']  # get the user_id from the session dictionary
-    task_name = request.form.get(task_name=task_name)  # get from the form user fills out
-    duration_estimate = request.form.get(duration_estimate=duration_estimate)  # get from form
+    task_name = request.form.get("task_name")  # get from the form user fills out
+    duration_estimate = request.form.get("duration_estimate")  # get from form
     new_task = Task(user_id=user_id, task_name=task_name, 
                     duration_estimate=duration_estimate)  # instantiate a Task object
 
@@ -180,39 +180,36 @@ def update_user_setting():
     return redirect("/settings")
 
 @app.route("/dashboard", methods=["GET"])
-def show_user_gameplan():
-    """Show user's morning gameplan."""
+def show_user_tasks_and_gameplan():
+    """Show user's task templates and morning gameplan."""
 
     user_id = session['user'] # get the user_id from the session dictionary
     user = User.query.get(user_id) # use the user_id to get the user object
     username = user.username # get the username from the user object
-    gameplan_tasks = GameplanTask.query.filter_by(user_id=user_id).all()
+    gameplan_tasks = GameplanTask.query.filter_by(user_id=user_id).order_by(GameplanTask.order).all()
     tasks = Task.query.filter_by(user_id=user_id).all()
 
     return render_template("dashboard.html", username=username,
                             gameplan_tasks=gameplan_tasks, tasks=tasks)
 
 
-@app.route("/gameplan", methods=["DELETE","POST"])
-def update_gameplan():
-    """Update user's gameplan."""
-    # First clears out the current gameplan tasks for that user.
-    # Then commits all information in gameplan into the gameplan table 
-    # so user can access it next time logs in.
+@app.route("/api/add_task_to_gameplan", methods=["POST"])
+def add_task_to_gameplan():
+    """Edit user's gameplan."""
+    # add a task to gameplan using a task template
 
     user_id = session['user']  # get the user_id from the session
-    user = User.query.get(user_id)  # get the user object
-    gameplan_tasks = user.gameplan # get the list of gameplan tasks for user
-    for item in gameplan_tasks:  # loop through each task in the list
-        db.session.delete(item)  # delete that task
-    db.session.commit()  # commit changes
-    
-    #** Somehow get all the gameplan task objects that are in gameplan area
-    # and add them to a list, call it new_gameplan
+    task_id = request.form.get("gameplan_task_name")  # get from the drop down
+    start_time = request.form.get("start_time")
+    end_time = request.form.get("end_time")
+    order = request.form.get("order")
+    order = int(order)
 
-    for item in new_gameplan:  # loop through each item in the list
-        db.session.add(item)  # add that item
-    db.session.commit() # commit changes
+    new_gameplan_task = GameplanTask(task_id=task_id, user_id=user_id, 
+                                     order=order, start_time=start_time, 
+                                     end_time=end_time)
+    db.session.add(new_gameplan_task)
+    db.session.commit()
 
     return redirect("/dashboard")
 
