@@ -5,24 +5,62 @@
 {% block content %}
 
     <div class="row">
-        <h2>Welcome</h2>
-        <p>Elevate your morning routine</p>
+        <h2>Welcome, {{username}}!</h2>
+        <p>Let's set your intention for this morning.</p>
     </div>
 
-    <div class="col-xs-12 col-md-8">
-        {% if "user_id" in session %}
-            <div display: inline-block>
-                <form action="/">
-                <input type="submit" name="loggedOut" value="Log Out">
-                </form>
-            </div>
+    <div class="container">
+        <!-- Row of three columns -->
+        <div class="row">
+          <div class="col-md-4">
+            <h2>Task templates</h2>
+            <p>List of task templates you've created will appear here. </p>
+            <table class="table">
+                <thead>
+                <th>Task</th>
+                <th>Estimated duration</th>
+                </thead>
+                <tbody>
+                {% for task in tasks %}
+                    <tr>
+                    <td>{{ task.task_name }}</td>
+                    <td>{{ task.duration_estimate }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
+          </div>
+          <div class="col-md-4">
+            <h2>Gameplan</h2>
+            <p>List of tasks to do this morning will appear here.</p>
+            <table class="table">
+                <thead>
+                <th>Gameplan Task</th>
+                <th>Start time</th>
+                <th>End time</th>
+                </thead>
+                <tbody>
+                {% for gameplan_task in gameplan_tasks %}
+                    <tr>
+                    <td>{{ gameplan_task.task_name }}</td>
+                    <td>{{ gameplan_task.start_time }}</td>
+                    <td>{{ gameplan_task.end_time}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
+          </div>
+          <div class="col-md-4">
+            <h2>Google Maps</h2>
+            <p>Google maps API will appear here.</p>
+            <p><a class="btn btn-secondary" href="#" role="button">View details »</a></p>
+          </div>
+        </div>
 
-        {% else %}
-            <div display: inline-block>
-                <form action="/login">
-                    <input type="submit" name="loggedIn" value="Log In">
-                </form>
-            </div>
-        {% endif %}
+        <hr>
+
+      </div>
 
 {% endblock %}
