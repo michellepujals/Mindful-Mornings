@@ -3,11 +3,19 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-
+<div class="container">
+    <!-- Row of 2 columns -->
     <div class="row">
+        <div class="col-md-6">
         <h2>Welcome, {{username}}!</h2>
         <p>Let's set your intention for this morning.</p>
     </div>
+    <div class="col-md-6">
+        <p> <b>Intention for today:</b> {{ intention }}</p>
+        <p> <b>Priority for today:</b> {{ priority }} </p>
+        <p> <b>Notes/reminders for today:</b> {{ notes_reminders }} </p>
+    </div>
+</div>
 
     <div class="container">
         <!-- Row of three columns -->
@@ -30,19 +38,19 @@
                 </tbody>
             </table>
             <p>Create a task template here:</p>
-        <form method="POST" action="/api/task">
-          <div class="form-group">
-            <label for="field-task_name">Task name</label>
-            <input id="task_name" class="form-control" type="text" name="task_name" required>
-          </div>
-          <div class="form-group">
-            <label for="field-duration_estimate">Duration estimate (in minutes)</label>
-            <input id="field-duration_estimate" class="form-control" type="text" name="duration_estimate" required>
-          </div>
-          <div class="form-group">
-            <input type="submit" value="Save" class="btn btn-primary">
-          </div>
-        </form>
+            <form method="POST" action="/api/task">
+                <div class="form-group">
+                    <label for="field-task_name">Task name</label>
+                    <input id="task_name" class="form-control" type="text" name="task_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="field-duration_estimate">Duration estimate (in minutes)</label>
+                    <input id="field-duration_estimate" class="form-control" type="text" name="duration_estimate" required>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary">
+                </div>
+            </form>
           </div>
           <div class="col-md-4">
             <h2>Gameplan</h2>
