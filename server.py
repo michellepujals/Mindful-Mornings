@@ -188,9 +188,17 @@ def show_user_tasks_and_gameplan():
     username = user.username # get the username from the user object
     gameplan_tasks = GameplanTask.query.filter_by(user_id=user_id).order_by(GameplanTask.order).all()
     tasks = Task.query.filter_by(user_id=user_id).all()
+    priority_object = UserSetting.query.filter_by(user_id=user_id, setting_id=1).first()
+    priority = priority_object.value
+    intention_object = UserSetting.query.filter_by(user_id=user_id, setting_id=9).first()
+    intention = intention_object.value
+    notes_reminders_object = UserSetting.query.filter_by(user_id=user_id, setting_id=10).first()
+    notes_reminders = notes_reminders_object.value
 
     return render_template("dashboard.html", username=username,
-                            gameplan_tasks=gameplan_tasks, tasks=tasks)
+                            gameplan_tasks=gameplan_tasks, tasks=tasks, 
+                            priority=priority, intention=intention,
+                            notes_reminders=notes_reminders)
 
 
 @app.route("/api/add_task_to_gameplan", methods=["POST"])
