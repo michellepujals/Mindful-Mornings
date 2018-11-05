@@ -101,6 +101,18 @@
           <div class="col-md-4">
             <h2>Google Maps</h2>
             <p>Google maps API will appear here.</p>
+            <div id="map"></div>
+            <script>
+                function initMap() {
+                    let myHome = { lat: 37.783581,lng: -122.203272 };
+                    let map = new google.maps.Map(
+                        document.getElementById('map'), {zoom: 4, center: myHome});
+                    let marker = new google.maps.Marker({position: myHome, map: map});
+                }
+            </script>
+            <script async defer 
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgCCeTUkEkpOjg1RmeppwI2-F7WVCcoj4&callback=initMap">
+            </script>
           </div>
         </div>
 
