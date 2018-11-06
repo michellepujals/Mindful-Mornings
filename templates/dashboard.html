@@ -71,6 +71,7 @@
                 {% endfor %}
                 </tbody>
             </table>
+            <div id="root"></div> <!-- This is where React will go-->
             <p>Choose existing template to add to your Gameplan:</p>
             <form method="POST" action="/api/add_task_to_gameplan">
                 <div class="form-group">
@@ -116,12 +117,9 @@
             <script async defer 
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgCCeTUkEkpOjg1RmeppwI2-F7WVCcoj4&callback=initMap">
             </script>
-            <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgCCeTUkEkpOjg1RmeppwI2-F7WVCcoj4&libraries=places"></script>
           </div>
         </div>
-
         <hr>
-
       </div>
 
 {% endblock %}
