@@ -102,17 +102,21 @@
             <h2>Google Maps</h2>
             <p>Google maps API will appear here.</p>
             <div id="map"></div>
-            <script>
-                function initMap() {
-                    let myHome = { lat: 37.783581,lng: -122.203272 };
-                    let map = new google.maps.Map(
-                        document.getElementById('map'), {zoom: 4, center: myHome});
-                    let marker = new google.maps.Marker({position: myHome, map: map});
-                }
-            </script>
+            <div id="directionsPanel" </div>
+            <div id="floatingPanel">
+            <b>Mode of Travel: </b>
+            <select id="mode">
+                <option value="DRIVING">Driving</option>
+                <option value="WALKING">Walking</option>
+                <option value="BICYCLING">Bicycling</option>
+                <option value="TRANSIT">Transit</option>
+             </select>
+            </div>
+            <script src="/static/dashboard.js"></script> 
             <script async defer 
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgCCeTUkEkpOjg1RmeppwI2-F7WVCcoj4&callback=initMap">
             </script>
+            <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgCCeTUkEkpOjg1RmeppwI2-F7WVCcoj4&libraries=places"></script>
           </div>
         </div>
 
