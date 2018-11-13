@@ -8,30 +8,33 @@
     <title>{% block title %}TITLE HERE{% endblock %}</title>
 
     <!-- Bootstrap -->
-    <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.4/cyborg/bootstrap.min.css"
-        rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.4/cyborg/bootstrap.min.css" rel="stylesheet">
     <link href='http://fonts.googleapis.com/css?family=Frijole' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
 </head>
 <body>
-<div class="container">
-  <h1>
-    <a href="/">Mindful Mornings</a>
-  </h1>
-  {% for msg in get_flashed_messages() %}
-    <div class="alert alert-info">{{ msg }}</div>
-  {% endfor %}
+  <header class="container">
+    <h1>
+      <a href="/">Mindful Mornings</a>
+    </h1>
+    {% for msg in get_flashed_messages() %}
+      <div class="alert alert-info">{{ msg }}</div>
+    {% endfor %}
+  </header>
+  
+  {% block content %}
 
-  {% block content %}CONTENT HERE
+    CONTENT HERE
 
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-   <script src="js/bootstrap.min.js"></script>
+  {% endblock %}
+   
+  {% block scripts %}
 
-   {% endblock %}
-</div>
+   SCRIPTS HERE 
 
-<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-
+  {% endblock %}
 </body>
 </html>

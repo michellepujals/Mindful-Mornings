@@ -18,7 +18,7 @@ app.jinja_env.undefined = StrictUndefined # Raises error for undefined vars
 # /api/ is for React
 
 @app.route("/")
-def show_homepage():
+def show_index():
     """Show homepage.""" 
     user_id = session['user']
     if user_id:
@@ -29,7 +29,7 @@ def show_homepage():
     else:
         username = "friend"   # Welcome person even if they are not logged in 
 
-    return render_template("homepage.html", username=username)
+    return render_template("index.html", username=username)
 
 
 @app.route("/register", methods=["GET"])
@@ -95,7 +95,7 @@ def check_login_credentials():
         flash("Your username does not exist. Please try again or register as a new user.")
         return redirect("/")
 
-    return render_template("homepage.html", username=username, password=password,
+    return render_template("index.html", username=username, password=password,
                             user=user)
 
 
@@ -116,6 +116,8 @@ def task_list():
 
     user_id = session['user']  # get the user_id from the session dictionary
     tasks = Task.query.filter_by(user_id=user_id).all()  # get list of user's task objects
+
+    
 
     # may need to figure out what to get out of the task objects to display
 
