@@ -20,6 +20,7 @@ gulp.task('jsx', () => {
       presets: [
         '@babel/preset-env',
         '@babel/preset-react'
+        // '@babel/plugin-proposal-class-properties'
       ],
       sourceMaps: true
     })
