@@ -130,11 +130,16 @@
 
 {% block scripts %}
 
+
     <script src="/static/googlemap.js"></script> 
     <script async defer 
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgCCeTUkEkpOjg1RmeppwI2-F7WVCcoj4&callback=initMap">
     </script>
+
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone"></script> <!--in browser Babel transformer/transpiler-->
-    <script src="static/bundle.js"></script> <!--name of js file where all the jsx files get compiled to-->
+    <script type="text/jsx" src="/static/app.jsx"></script> <!--name of js file where all the jsx files get compiled to-->
+    <script type="text/jsx" src="/static/index.jsx"></script>
     
 {% endblock %}
