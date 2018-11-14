@@ -22,9 +22,9 @@
   "dependencies": {
     "@atlaskit/css-reset": "^3.0.3",
     "eslint": "^5.9.0",
-    "react": "^16.6.0",
+    "react": "^16.4.1",
     "react-beautiful-dnd": "^10.0.1",
-    "react-dom": "^16.6.0",
+    "react-dom": "^16.4.1",
     "styled-components": "^4.1.1"
   }
 }
