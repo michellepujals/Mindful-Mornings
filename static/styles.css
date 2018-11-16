@@ -1,3 +1,31 @@
+body {
+    color: #f3c251;
+    background-color: #4f2263e6;
+}
+
+table, .table {
+    color: #222222;
+    background-color: #a77657;
+}
+
+#homepage-link {
+    color: #fbc752;
+}
+
+#welcome-message {
+    color: #8d8700;
+}
+
+a {
+    color: #fbc752
+}
+
+a:hover, a:focus {
+    color: #c3b100;
+    text-decoration: underline;
+}
+
+
 .form-control {
   width: 40%;
 }
@@ -19,3 +47,16 @@
     line-height: 30px;
     padding-left: 10px;
       }
+
+
+tr.pending {
+    background-color: #f2c151;
+}
+
+tr.done {
+    background-color: gray;
+}
+
+tr {
+    transition: 0.2s ease;
+}

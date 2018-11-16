@@ -5,22 +5,25 @@
 {% block title %}Welcome to Mindful Mornings!{% endblock %}
 
 {% block content %}
+<div class="col-md-12">
+    <div class="container">
+      <div class="row">
+            <h2>Welcome, {{username}}!</h2>
+            <h4 id="welcome-message">Let's set your intention for this morning.</h4>
+        </div>
 
-    <div class="row">
-        <h2>Welcome, {{username}}!</h2>
-        <p>Let's set your intention for this morning.</p>
+        {% if session['user'] %}
+
+            <h2>Go to Dashboard</h2>
+                <a href="/dashboard">Dashboard</a>
+
+            <h2>Go to Settings</h2>
+              <a href="/settings">Settings</a>
+
+            <h2>Logout</h2>
+              <a href="/logout">Logout<a>
     </div>
-
-    {% if session['user'] %}
-
-        <h2>Go to Dashboard</h2>
-            <a href="/dashboard">Dashboard</a>
-
-        <h2>Go to Settings</h2>
-          <a href="/settings">Settings</a>
-
-        <h2>Logout</h2>
-          <a href="/logout">Logout<a>
+</div>
 
     {% else %}
 

@@ -18,19 +18,19 @@
 <body>
   <header class="container">
     <h1>
-      <a href="/">Mindful Mornings</a>
+      <a href="/" id="homepage-link">Mindful Mornings</a>
     </h1>
     {% for msg in get_flashed_messages() %}
       <div class="alert alert-info">{{ msg }}</div>
     {% endfor %}
   </header>
-  
+
   {% block content %}
 
     CONTENT HERE
 
   {% endblock %}
-   
+
   {% block scripts %}
 
   {% endblock %}

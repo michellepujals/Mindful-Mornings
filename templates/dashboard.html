@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-md-6">
             <h2>Welcome, {{username}}!</h2>
-            <p>Let's set your intention for this morning.</p>
+            <h4 id="welcome-message">Let's set your intention for this morning.</h4>
         </div>
 
         <div class="col-md-6">
@@ -42,7 +42,7 @@
     </table>
 
     <p>Create a task template here:</p>
-    
+
     <form method="POST" action="/api/task">
       <div class="form-group">
         <label for="field-task_name">Task name</label>
@@ -69,7 +69,7 @@
         </thead>
         <tbody>
         {% for gameplan_task in gameplan_tasks %}
-            <tr>
+            <tr class="pending" >
             <td>{{ gameplan_task.task.task_name }}</td>
             <td>{{ gameplan_task.start_time }}</td>
             <td>{{ gameplan_task.end_time}}</td>
@@ -118,7 +118,7 @@
         <option value="BICYCLING">Bicycling</option>
         <option value="TRANSIT">Transit</option>
      </select>
-    </div>           
+    </div>
   </div>
 </div>
 
@@ -130,16 +130,14 @@
 
 {% block scripts %}
 
-
-    <script src="/static/googlemap.js"></script> 
-    <script async defer 
+    <script src="/static/googlemap.js"></script>
+    <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgCCeTUkEkpOjg1RmeppwI2-F7WVCcoj4&callback=initMap">
     </script>
 
     <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone"></script> <!--in browser Babel transformer/transpiler-->
-    <script type="text/jsx" src="/static/app.jsx"></script> <!--name of js file where all the jsx files get compiled to-->
     <script type="text/jsx" src="/static/index.jsx"></script>
-    
+
 {% endblock %}
