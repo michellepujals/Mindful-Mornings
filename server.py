@@ -1,25 +1,26 @@
 """File that deals with server for Mindful Mornings site."""
 
 from jinja2 import StrictUndefined
-from flask import (Flask, render_template, redirect, request, flash, 
-                    session, Markup)
+from flask import (Flask, render_template, redirect, request, flash,
+                   session)
 from flask_debugtoolbar import DebugToolbarExtension
 from model import *  # import everything from model.py
 
-app = Flask(__name__) # this is the instance of the flask application
+app = Flask(__name__)  # this is the instance of the flask application
 
-app.secret_key = "ABC" # Required to use Flask sessions and debug toolbar
+app.secret_key = "ABC"  # Required to use Flask sessions and debug toolbar
 
-app.jinja_env.undefined = StrictUndefined # Raises error for undefined vars
+app.jinja_env.undefined = StrictUndefined  # Raises error for undefined vars
 
-## Routes here #############################################################
+# Routes here #############################################################
 
-# use a lot of RESTful API stuff here (mostly single-page app, will use AJAX/React)
-# /api/ is for React
+# use a lot of RESTful API stuff here
+# mostly single-page app, will use AJAX/React) /api/ stuff is for react?
+
 
 @app.route("/")
 def show_index():
-    """Show homepage.""" 
+    """Show homepage."""
     user_id = session['user']
     if user_id:
         user = User.query.get(user_id)
@@ -27,7 +28,7 @@ def show_index():
         if user:
             username = user.username
     else:
-        username = "friend"   # Welcome person even if they are not logged in 
+        username = "friend"   # Welcome person even if they are not logged in
 
     return render_template("index.html", username=username)
 
@@ -42,27 +43,25 @@ def display_registration_form():
 @app.route("/register", methods=["POST"])
 def execute_user_registration():
     """Add new user to database using info provided in registration form."""
-    # this is a dictionary . get request, does not return error if nothing there
-    # will return None. ** Find out how to make 2 of these fields mandatory
 
     username = request.form.get("username")
     password = request.form.get("password")
     confirm_password = request.form.get("confirm_password")
-    
+
     if password != confirm_password:
         flash("Your passwords do not match. Please try again.")
-        return redirect ("/register")
+        return redirect("/register")
 
     user = User(username=username, password=password)
     db.session.add(user)
     db.session.commit()
 
-    user_id = user.user_id # get new user's user_id (automatically generated)
+    user_id = user.user_id  # get new user's user_id (automatically generated)
 
-    settings = Setting.query.all() # list of all settings objects
+    settings = Setting.query.all()  # list of all settings objects
 
-    for setting in settings: # going from Settings object to UserSetting object
-        new_user_setting = UserSetting(user_id=user_id, 
+    for setting in settings:  # going from Settings object -> UserSetting
+        new_user_setting = UserSetting(user_id=user_id,
                                        setting_id=setting.setting_id,
                                        value=setting.setting_default_value)
         db.session.add(new_user_setting)
@@ -75,16 +74,16 @@ def execute_user_registration():
 
 @app.route("/login", methods=["POST"])
 def check_login_credentials():
-    """Check user email and password against the database, add user to session."""
+    """Check user email and password against the db, add user to session."""
 
-    username = request.form.get("username") # get username from form
-    password = request.form.get("password") # get password from form
-    user = User.query.filter_by(username=username).first() # queries the db for the user object
+    username = request.form.get("username")  # get username from form
+    password = request.form.get("password")  # get password from form
+    user = User.query.filter_by(username=username).first()  # queries database
 
     if user:  # if the user exists (if that username exists)
         if user.password == password:  # check if the password is the same
-            session['user'] = user.user_id # adds user to the session
-            #flask_login.login_user(user) # flask-login specific method call --later **
+            session['user'] = user.user_id  # adds user to the session
+
             flash("You are now logged in.")
             return redirect("/")
         else:
@@ -96,7 +95,7 @@ def check_login_credentials():
         return redirect("/")
 
     return render_template("index.html", username=username, password=password,
-                            user=user)
+                           user=user)
 
 
 @app.route("/logout")
@@ -104,7 +103,6 @@ def log_out_user():
     """Log user out."""
 
     session['user'] = None  # clears the user's data from the session
-    #flask_login.logout_user() # Flask-login specific method call--later **
     flash("You are now logged out.")
 
     return redirect("/")
@@ -112,14 +110,10 @@ def log_out_user():
 
 @app.route("/api/tasks", methods=["GET"])
 def task_list():
-    """Show list of tasks.""" # All task objects for this user
+    """Show list of tasks."""  # All task objects for this user
 
     user_id = session['user']  # get the user_id from the session dictionary
-    tasks = Task.query.filter_by(user_id=user_id).all()  # get list of user's task objects
-
-    
-
-    # may need to figure out what to get out of the task objects to display
+    tasks = Task.query.filter_by(user_id=user_id).all()  # get list of tasks
 
     return render_template("dashboard.html", tasks=tasks)
 
@@ -129,15 +123,15 @@ def add_new_task():
     """Add a new task to user's task list."""
 
     user_id = session['user']  # get the user_id from the session dictionary
-    task_name = request.form.get("task_name")  # get from the form user fills out
+    task_name = request.form.get("task_name")  # get from the form
     duration_estimate = request.form.get("duration_estimate")  # get from form
-    new_task = Task(user_id=user_id, task_name=task_name, 
-                    duration_estimate=duration_estimate)  # instantiate a Task object
+    new_task = Task(user_id=user_id, task_name=task_name,
+                    duration_estimate=duration_estimate)  # instantiate a Task
 
-    db.session.add(new_task)  # add new task object to user's list of tasks (tasks table)
+    db.session.add(new_task)  # add new task object to user's list of tasks
     db.session.commit()
 
-    return redirect ("/dashboard")  # go back to dashboard
+    return redirect("/dashboard")  # go back to dashboard
 
 
 @app.route("/api/task/<task_id>", methods=["DELETE"])
@@ -147,9 +141,9 @@ def delete_task_from_task_list():
     task_id = request.form.get(task_id=task_id)  # get task_id from form
     task_to_delete = Task.query.get(task_id)  # get the task object to delete
     db.session.delete(task_to_delete)  # delete from database/task table
-    db.session.commit() 
+    db.session.commit()
 
-    return redirect ("/dashboard")  # go back to dashboard
+    return redirect("/dashboard")  # go back to dashboard
 
 
 @app.route("/settings", methods=["GET"])
@@ -157,50 +151,59 @@ def show_user_settings():
     """Show user's settings."""
 
     if session['user']:
-        user_id = session['user'] # get the user_id from the session dictionary
-        user = User.query.get(user_id) # use the user_id to get the user object
-        username = user.username # get the username from the user object
-        user_settings = UserSetting.query.filter_by(user_id=user_id).all() # list of setting objects
+        user_id = session['user']  # get the user_id from the session
+        user = User.query.get(user_id)  # use the user_id to get the user
+        username = user.username  # get the username from the user object
+        user_settings = UserSetting.query.filter_by(user_id=user_id).all()
     else:
         return redirect("/")
 
-    return render_template("user_settings.html", username=username, 
-                            user_settings=user_settings)
+    return render_template("user_settings.html", username=username,
+                           user_settings=user_settings)
+
 
 @app.route("/api/setting/<name>", methods=['PUT'])
 def update_user_setting():
     """Update a setting for a user."""
 
-    user_id = session['user'] # get the user_id from the session dictionary
-    username = user.username # get the username from the user object
+    user_id = session['user']  # get the user_id from the session dictionary
+    username = user.username  # get the username from the user object
     new_value_user_setting = request.form.get(value=value)  # get from form
-    user_setting = UserSetting.query.filter_by(user_setting_id=user_setting_id).one() # get the user setting object
-    user_setting.value = new_value_user_setting  # update setting with new value
+    user_setting = UserSetting.query.filter_by(user_setting_id=user_setting_id).one()  # get the user setting object
+    user_setting.value = new_value_user_setting  # update setting w new value
 
     db.session.commit()
 
     return redirect("/settings")
 
+
 @app.route("/dashboard", methods=["GET"])
 def show_user_tasks_and_gameplan():
     """Show user's task templates and morning gameplan."""
 
-    user_id = session['user'] # get the user_id from the session dictionary
-    user = User.query.get(user_id) # use the user_id to get the user object
-    username = user.username # get the username from the user object
+    user_id = session['user']  # get the user_id from the session dictionary
+    user = User.query.get(user_id)  # use the user_id to get the user object
+    username = user.username  # get the username from the user object
+
     gameplan_tasks = GameplanTask.query.filter_by(user_id=user_id).order_by(GameplanTask.order).all()
     tasks = Task.query.filter_by(user_id=user_id).all()
-    priority_object = UserSetting.query.filter_by(user_id=user_id, setting_id=1).first()
+
+    priority_object = UserSetting.query.filter_by(user_id=user_id,
+                                                  setting_id=1).first()
     priority = priority_object.value
-    intention_object = UserSetting.query.filter_by(user_id=user_id, setting_id=9).first()
+
+    intention_object = UserSetting.query.filter_by(user_id=user_id,
+                                                   setting_id=9).first()
     intention = intention_object.value
-    notes_reminders_object = UserSetting.query.filter_by(user_id=user_id, setting_id=10).first()
+
+    notes_reminders_object = UserSetting.query.filter_by(user_id=user_id,
+                                                         setting_id=10).first()
     notes_reminders = notes_reminders_object.value
 
     return render_template("dashboard.html", username=username,
-                            gameplan_tasks=gameplan_tasks, tasks=tasks, 
-                            priority=priority, intention=intention,
-                            notes_reminders=notes_reminders)
+                           gameplan_tasks=gameplan_tasks, tasks=tasks,
+                           priority=priority, intention=intention,
+                           notes_reminders=notes_reminders)
 
 
 @app.route("/api/add_task_to_gameplan", methods=["POST"])
@@ -215,8 +218,8 @@ def add_task_to_gameplan():
     order = request.form.get("order")
     order = int(order)
 
-    new_gameplan_task = GameplanTask(task_id=task_id, user_id=user_id, 
-                                     order=order, start_time=start_time, 
+    new_gameplan_task = GameplanTask(task_id=task_id, user_id=user_id,
+                                     order=order, start_time=start_time,
                                      end_time=end_time)
     db.session.add(new_gameplan_task)
     db.session.commit()
@@ -234,8 +237,8 @@ def display_about_page():
 if __name__ == "__main__":
     # set debug to true since it has to be true at the point
     # where we invoke the DebugToolbarExtension
-    app.debug = True 
-                   
+    app.debug = True
+
     # make sure templates, etc. are not cached in debug mode
     app.jinja_env.auto_reload = app.debug
 
@@ -245,14 +248,5 @@ if __name__ == "__main__":
     DebugToolbarExtension(app)
 
     app.run(port=5000, host='0.0.0.0')
-
-## Some of these routes will need to be changed to JSON using jsonify
-
-
-
-
-
-
-
 
 
