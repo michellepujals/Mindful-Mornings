@@ -14,21 +14,19 @@ app.jinja_env.undefined = StrictUndefined  # Raises error for undefined vars
 
 # Routes here #############################################################
 
-# use a lot of RESTful API stuff here
-# mostly single-page app, will use AJAX/React) /api/ stuff is for react?
-
 
 @app.route("/")
 def show_index():
     """Show homepage."""
-    user_id = session['user']
-    if user_id:
-        user = User.query.get(user_id)
 
+    if session['user']:
+        user_id = session['user']
+        user = User.query.get(user_id)
         if user:
             username = user.username
+
     else:
-        username = "friend"   # Welcome person even if they are not logged in
+        username = "friend"
 
     return render_template("index.html", username=username)
 
@@ -134,14 +132,17 @@ def add_new_task():
     return redirect("/dashboard")  # go back to dashboard
 
 
-@app.route("/api/task/<task_id>", methods=["DELETE"])
-def delete_task_from_task_list():
+@app.route("/api/task/<task_id>", methods=["GET", "DELETE"])
+def delete_task_from_task_list(task_id):
     """Delete a task from user's task list."""
 
-    task_id = request.form.get(task_id=task_id)  # get task_id from form
-    task_to_delete = Task.query.get(task_id)  # get the task object to delete
-    db.session.delete(task_to_delete)  # delete from database/task table
-    db.session.commit()
+    try:
+        task_to_delete = Task.query.get(task_id)  # get the task object to delete
+        db.session.delete(task_to_delete)  # delete from database/task table
+        db.session.commit()
+
+    except AssertionError:
+        flash("That task is active in your gameplan! Remove that task from gameplan before deleting from templates.")
 
     return redirect("/dashboard")  # go back to dashboard
 
@@ -190,15 +191,24 @@ def show_user_tasks_and_gameplan():
 
     priority_object = UserSetting.query.filter_by(user_id=user_id,
                                                   setting_id=1).first()
-    priority = priority_object.value
+    if priority_object:
+        priority = priority_object.value
+    else:
+        priority = None
 
     intention_object = UserSetting.query.filter_by(user_id=user_id,
                                                    setting_id=9).first()
-    intention = intention_object.value
+    if intention_object:
+        intention = intention_object.value
+    else:
+        intention = None
 
     notes_reminders_object = UserSetting.query.filter_by(user_id=user_id,
                                                          setting_id=10).first()
-    notes_reminders = notes_reminders_object.value
+    if notes_reminders_object:
+        notes_reminders = notes_reminders_object.value
+    else:
+        notes_reminders = None
 
     return render_template("dashboard.html", username=username,
                            gameplan_tasks=gameplan_tasks, tasks=tasks,
@@ -208,7 +218,7 @@ def show_user_tasks_and_gameplan():
 
 @app.route("/api/add_task_to_gameplan", methods=["POST"])
 def add_task_to_gameplan():
-    """Edit user's gameplan."""
+    """Add a task to user's gameplan."""
     # add a task to gameplan using a task template
 
     user_id = session['user']  # get the user_id from the session
@@ -225,6 +235,17 @@ def add_task_to_gameplan():
     db.session.commit()
 
     return redirect("/dashboard")
+
+
+@app.route("/api/gptask/<task_id>", methods=["GET", "DELETE"])
+def delete_task_from_gameplan(task_id):
+    """Delete a task from user's active gameplan."""
+
+    gptask_to_delete = GameplanTask.query.get(task_id)  # get the object
+    db.session.delete(gptask_to_delete)  # delete from database/task table
+    db.session.commit()
+
+    return redirect("/dashboard")  # go back to dashboard
 
 
 @app.route("/about")
@@ -245,8 +266,6 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the debug toolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
     app.run(port=5000, host='0.0.0.0')
-
-

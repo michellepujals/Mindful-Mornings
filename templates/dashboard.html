@@ -3,12 +3,13 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+
 <div class="container">
     <!-- Row of 2 columns -->
     <div class="row">
         <div class="col-md-6">
             <h2>Welcome, {{username}}!</h2>
-            <h4 id="welcome-message">Let's set your intention for this morning.</h4>
+            <h4 id="intention-message">Let's set your intention for this morning.</h4>
         </div>
 
         <div class="col-md-6">
@@ -24,18 +25,26 @@
 <div class="row">
   <div class="col-md-4">
     <h2>Task templates</h2>
-    <p>List of task templates you've created will appear here. </p>
+    <p>Store your custom templates: </p>
 
-    <table class="table">
+    <table class="table table-hover table-primary">
       <thead>
-        <th>Task</th>
-        <th>Estimated duration</th>
+        <tr class="table-primary">
+            <th scope="col">Task</th>
+            <th scope="col">Estimated duration</th>
+            <th scope="col"></th>
+        </tr>
       </thead>
       <tbody>
       {% for task in tasks %}
-        <tr>
-          <td>{{ task.task_name }}</td>
-          <td>{{ task.duration_estimate }}</td>
+        <tr class="table-primary" id={{task.task_id}}>
+            <form method="DELETE" action="/api/task/{{task.task_id}}">
+                <th scope="row">{{ task.task_name }}</th>
+                <td>{{ task.duration_estimate }}</td>
+                <td>
+                    <button type="submit" value="delete" class="btn btn-secondary btn-sm">delete</button>
+                </td>
+            </form>
         </tr>
       {% endfor %}
       </tbody>
@@ -60,24 +69,32 @@
 
   <div class="col-md-4">
     <h2>Gameplan</h2>
-    <p>List of tasks to do this morning will appear here.</p>
-    <table class="table">
+    <p>Map out your morning here:</p>
+    <table class="table table-hover table-primary">
         <thead>
-        <th>Gameplan Task</th>
-        <th>Start time</th>
-        <th>End time</th>
+            <tr class="table-primary">
+                <th scope="col">Gameplan Task</th>
+                <th scope="col">Start time</th>
+                <th scope="col">End time</th>
+                <th scope="col"></th>
+            </tr>
         </thead>
         <tbody>
         {% for gameplan_task in gameplan_tasks %}
-            <tr class="pending" >
-            <td>{{ gameplan_task.task.task_name }}</td>
-            <td>{{ gameplan_task.start_time }}</td>
-            <td>{{ gameplan_task.end_time}}</td>
+            <tr class="table-primary" id={{gameplan_task.task.task_id}}>
+                <form method="DELETE" action="/api/gptask/{{gameplan_task.task.task_id}}">
+                    <th scope="row">{{ gameplan_task.task.task_name }}</th>
+                    <td>{{ gameplan_task.start_time }}</td>
+                    <td>{{ gameplan_task.end_time}}</td>
+                    <td>
+                        <button type="submit" value="delete" class="btn btn-secondary btn-sm">delete</button>
+                    </td>
+                </form>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-    <div id="root"></div> <!-- This is where React will go-->
+    <!--<div id="root"></div> This is where React will go-->
     <p>Choose existing template to add to your Gameplan:</p>
     <form method="POST" action="/api/add_task_to_gameplan">
         <div class="form-group">
@@ -107,16 +124,16 @@
   </div>
   <div class="col-md-4">
     <h2>Google Maps</h2>
-    <p>Google maps API will appear here.</p>
+    <p>Keep an eye on transit here:</p>
     <div id="map"></div>
     <div id="directionsPanel" </div>
     <div id="floatingPanel">
     <b>Mode of Travel: </b>
     <select id="mode">
-        <option value="DRIVING">Driving</option>
-        <option value="WALKING">Walking</option>
-        <option value="BICYCLING">Bicycling</option>
         <option value="TRANSIT">Transit</option>
+        <option value="DRIVING">Driving</option>
+        <option value="BICYCLING">Bicycling</option>
+        <option value="WALKING">Walking</option>
      </select>
     </div>
   </div>
