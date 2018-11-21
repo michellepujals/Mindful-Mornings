@@ -3,30 +3,27 @@
 {% block title %}Settings{% endblock %}
 
 {% block content %}
-
-<div class="col-md-12">
-    <div class="container">
-        <div class="row">
-            <h2>Welcome</h2>
-            <p>Elevate your morning routine</p>
-        </div>
-
-    <h2>Settings</h2>
-    <table class="table">
-        <thead>
-        <th>Setting Name</th>
-        <th>Value</th>
-        </thead>
-    <tbody>
-    {% for user_setting in user_settings %}
-      <tr>
-        <td>{{ user_setting.setting.setting_name }}</td>
-        <td>{{ user_setting.value}}</td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-</div>
+<div class="container">
+    <div class="col-md-6">
+        <h2>Welcome, {{username}}!</h2>
+    </div>
+    <div class="col-md-12">
+        <h4>Your settings are listed here:</h4>
+        <table class="table">
+            <thead>
+                <th>Setting Name</th>
+                <th>Value</th>
+            </thead>
+            <tbody>
+            {% for user_setting in user_settings %}
+            <tr>
+                <td>{{ user_setting.setting.setting_name }}</td>
+                <td>{{ user_setting.value}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 
 {% endblock %}

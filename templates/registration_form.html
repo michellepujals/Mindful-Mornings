@@ -3,13 +3,10 @@
 {% block title %}Registration Form{% endblock %}
 
 {% block content %}
-
-    <div class="row">
+<div class="container">
+    <div class="col=md-6"
         <h2>Welcome</h2>
-        <p>Elevate your morning routine</p>
-    </div>
-
-    <h2>Please choose a username and password to register</h2>
+        <h2>Please choose a username and password to register</h2>
         <form method="POST" action="/register">
           <div class="form-group">
             <label for="field-username">Username</label>
@@ -27,6 +24,8 @@
             <input type="submit" value="Register" class="btn btn-primary">
           </div>
         </form>
+    </div>
+</div>
 
 
 {% endblock %}
