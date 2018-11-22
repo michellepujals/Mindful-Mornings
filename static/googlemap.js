@@ -4,11 +4,11 @@ function initMap() {
     let directionsService = new google.maps.DirectionsService;
     let directionsDisplay = new google.maps.DirectionsRenderer;
     let myHome = new google.maps.LatLng(37.783581,-122.203272);
-    let bootcamp = new google.maps.LatLng(37.803135, -122.266952)
-     let mapOptions =  {
-        zoom: 10, 
+    let bootcamp = new google.maps.LatLng(37.803135, -122.266952);
+    let mapOptions =  {
+        zoom: 10,
         center: myHome
-    }
+    };
     let map = new google.maps.Map(document.getElementById('map'), mapOptions);
     directionsDisplay.setMap(map);
     directionsDisplay.setPanel(document.getElementById('directionsPanel'));
@@ -23,7 +23,7 @@ function initMap() {
 function calculateAndDisplayRoute(directionsService, directionsDisplay) {
     let selectedMode = document.getElementById('mode').value;
     let myHome = new google.maps.LatLng(37.783581,-122.203272);
-    let bootcamp = new google.maps.LatLng(37.803135, -122.266952)
+    let bootcamp = new google.maps.LatLng(37.803135, -122.266952);
     //let start = document.getElementById('start').value;
     //let end = document.getElementById('end').value;
     let request = {
@@ -32,12 +32,11 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
         travelMode: google.maps.TravelMode[selectedMode]
     };
     directionsService.route(request, function(response, status) {
-          if (status == 'OK') {
+        if (status == 'OK') {
             directionsDisplay.setDirections(response);
-          } else {
+        } else {
             window.alert('Directions request failed due to ' + status);
-          }
+        }
     });
 }
-
 

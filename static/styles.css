@@ -1,5 +1,9 @@
 /* Styles for Mindful Mornings site. */
 
+#floatingPanel {
+    padding: 5px
+}
+
 #intention-message {
     color: #e47025;
 }
