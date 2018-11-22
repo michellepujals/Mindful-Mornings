@@ -126,16 +126,21 @@
     <h2>Google Maps</h2>
     <p>Keep an eye on transit here:</p>
     <div id="map"></div>
-    <div id="directionsPanel" </div>
-    <div id="floatingPanel">
-    <b>Mode of Travel: </b>
-    <select id="mode">
-        <option value="TRANSIT">Transit</option>
-        <option value="DRIVING">Driving</option>
-        <option value="BICYCLING">Bicycling</option>
-        <option value="WALKING">Walking</option>
-     </select>
+    <div>
+        <input id="start" type="textbox" placeholder="Enter Starting Address"></input>
+        <input id="end" type="textbox" placeholder="Enter Ending Address"></input>
     </div>
+    <div id="floatingPanel">
+        <b>Mode of Travel: </b>
+        <select id="mode">
+            <option value="TRANSIT">Transit</option>
+            <option value="DRIVING">Driving</option>
+            <option value="BICYCLING">Bicycling</option>
+            <option value="WALKING">Walking</option>
+        </select>
+        <input id="directions" type="button" class="btn btn-primary" value="Get directions">
+    </div>
+    <div id="directionsPanel" ></div>
   </div>
 </div>
 
