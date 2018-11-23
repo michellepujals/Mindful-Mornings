@@ -1,5 +1,18 @@
 /* Styles for Mindful Mornings site. */
 
+.editable-text {
+  font-size: 1em;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  font-weight: bold;
+}
+
+p.editable-text {
+    cursor: pointer;
+    color: #fff;
+ }
+
 #floatingPanel {
     padding: 5px
 }
@@ -48,15 +61,7 @@ a:hover, a:focus {
     background-color: #FDF6E3;
 }
 
-
-tr.pending {
+h2 {
+    color: #fff;
 }
-
-tr.done {
-}
-
-tr {
-    transition: 0.2s ease;
-}
-
 /* yellow #c3b100, #fbc752*/
