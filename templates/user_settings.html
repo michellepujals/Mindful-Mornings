@@ -9,16 +9,27 @@
     </div>
     <div class="col-md-12">
         <h4>Your settings are listed here:</h4>
-        <table class="table">
+        <table class="table table-hover table-primary">
             <thead>
-                <th>Setting Name</th>
-                <th>Value</th>
+                <tr class="table-primary">
+                    <th scope="col">Setting Name</th>
+                    <th scope="col">Value</th>
+                    <th scope="col"></th>
+                </tr>
             </thead>
             <tbody>
             {% for user_setting in user_settings %}
-            <tr>
-                <td>{{ user_setting.setting.setting_name }}</td>
+            <tr class="table-primary">
+                <th scope="row">{{ user_setting.setting.setting_name }}</th>
                 <td>{{ user_setting.value}}</td>
+                <td>
+                    <form method="PUT" action="/api/setting/{{user_setting.user_setting_id}}">
+                        <div class="form-group">
+                            <input id="{{user_setting.user_setting_id}}" class="form-control" type="text" name={{user_setting.user_setting_id}}>
+                            <button type="submit" value="update" class="btn btn-secondary btn-sm">update</button>
+                        </div>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
             </tbody>
