@@ -155,7 +155,7 @@ def show_user_settings():
         user_id = session['user']  # get the user_id from the session
         user = User.query.get(user_id)  # use the user_id to get the user
         username = user.username  # get the username from the user object
-        user_settings = UserSetting.query.filter_by(user_id=user_id).all()
+        user_settings = UserSetting.query.filter_by(user_id=user_id).order_by(UserSetting.user_setting_id).all()
     else:
         return redirect("/")
 
@@ -163,13 +163,11 @@ def show_user_settings():
                            user_settings=user_settings)
 
 
-@app.route("/api/setting/<name>", methods=['PUT'])
-def update_user_setting():
+@app.route("/api/setting/<user_setting_id>", methods=["GET","PUT"])
+def update_user_setting(user_setting_id):
     """Update a setting for a user."""
 
-    user_id = session['user']  # get the user_id from the session dictionary
-    username = user.username  # get the username from the user object
-    new_value_user_setting = request.form.get(value=value)  # get from form
+    new_value_user_setting = request.values.get(user_setting_id)  # get from form
     user_setting = UserSetting.query.filter_by(user_setting_id=user_setting_id).one()  # get the user setting object
     user_setting.value = new_value_user_setting  # update setting w new value
 
