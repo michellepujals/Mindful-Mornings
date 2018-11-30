@@ -17,8 +17,8 @@ class User(db.Model):
 
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    username = db.Column(db.String(50), nullable=False, unique=True)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
 
     tasks = db.relationship("Task", backref='user')
@@ -41,7 +41,7 @@ class User(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return f"<User user_id={self.user_id} username={self.username}>"
+        return f"<User {self.id} | {self.username}>"
 
     @classmethod
     def get_user_by_username(cls, username):
@@ -53,7 +53,7 @@ class User(db.Model):
         """A method to make saving users simpler."""
         db.session.add(self)
         db.session.commit()
-    
+
     def create_password(self, password):
         self.password = generate_password_hash(password)
 
@@ -65,6 +65,7 @@ class User(db.Model):
             self.create_password(new)
             self.save()
 
+
 class Setting(db.Model):
     """List of all settings."""
     # Place to store the names of all of the settings, not values
@@ -73,9 +74,9 @@ class Setting(db.Model):
 
     __tablename__ = "settings"
 
-    setting_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    setting_name = db.Column(db.String(100), unique=True)
-    setting_default_value = db.Column(db.String(100))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True)
+    default_value = db.Column(db.String(100))
 
     users_settings = db.relationship("UserSetting")
     # setting.users_settings returns a list of the users' settings
@@ -100,8 +101,7 @@ class UserSetting(db.Model):
 
     __tablename__ = "users_settings"
 
-    user_setting_id = db.Column(db.Integer, autoincrement=True,
-                                primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"),
                         nullable=False)
     setting_id = db.Column(db.Integer, db.ForeignKey("settings.setting_id"),
@@ -125,11 +125,11 @@ class Task(db.Model):
 
     __tablename__ = "tasks"
 
-    task_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"),
                         nullable=False)
-    task_name = db.Column(db.String(50), nullable=False)
-    task_description = db.Column(db.String(100), nullable=True)  # optional
+    name = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(100), nullable=True)  # optional
     duration_estimate = db.Column(db.Integer, nullable=False)  # in minutes
     duration_actual = db.Column(db.Integer, nullable=True)  # in minutes
 
@@ -146,7 +146,7 @@ class Task(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return f"<Task task_id={self.task_id} task_name={self.task_name} user_id={self.user_id}>"
+        return f"<Task {self.id} | {self.name} for user {self.user_id}>"
 
     @property
     def order(self):
@@ -187,35 +187,25 @@ class Category(db.Model):
 
     __tablename__ = "categories"
 
-    category_id = db.Column(db.Integer, autoincrement=True,
-                            primary_key=True, nullable=False)
-    category_name = db.Column(db.String(100), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    tasks = db.relationship('Task', secondary=tasks_categories, backref=db.backref('category.id'))
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return f"<Category id={self.category_id} name={self.category_name}>"
+        return f"<Category {self.id} - {self.name}>"
 
 
-class TaskCategory(db.Model):
-    """Place to store tasks and what categories they belong to."""
-    # Just an association table. Not a meaningful middle table.
-    # A task belongs to a category. It can belong to multiple categories.
-    # A category can have many tasks.
+"""Place to store tasks and what categories they belong to."""
+# Just an association table. Not a meaningful middle table.
+# A task belongs to a category. It can belong to multiple categories.
+# A category can have many tasks.
 
-    __tablename__ = "tasks_categories"
-
-    tasks_categories_id = db.Column(db.Integer, autoincrement=True,
-                                    primary_key=True)
-    task_id = db.Column(db.Integer, db.ForeignKey("tasks.task_id"),
-                        nullable=False)
-    category_id = db.Column(db.Integer,
-                            db.ForeignKey("categories.category_id"))
-
-    def __repr__(self):
-        """Provide helpful information when printed."""
-
-        return f"<TaskCategory id= {self.tasks_categories_id} task_id={self.task_id} category_id={self.category_id}>"
+tasks_categories = db.Table(
+        db.Column('task_id'), db.Integer, db.ForeignKey('tasks.id'),
+        db.Column('category_id'), db.Integer, db.ForeignKey('categories.id'),
+    )
 
 
 #############################################################################
@@ -225,7 +215,7 @@ def connect_to_db(app):
     """Connect the database to the Flask app."""
 
     # Configure to use PostgresSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///mindfulmorning'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///mindfulmornings'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
