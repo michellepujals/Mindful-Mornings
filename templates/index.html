@@ -4,8 +4,11 @@
 
 {% block title %}Welcome to Mindful Mornings!{% endblock %}
 
-{% block content %}
+
 <div class="container">
+
+    {% block content %}
+    
         <div class="col-md-6">
             <h2>Welcome, {{username}}!</h2>
             <h4 id="intention-message">Let's set your intention for this morning.</h4>
@@ -48,9 +51,9 @@
                     <a id="register-button" href="/register">Register</a>
                 </button>
         </div>
-    </div>
+    
 
     {% endif %}
-
+</div>
 
 {% endblock %}

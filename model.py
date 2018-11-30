@@ -3,6 +3,9 @@
 from flask_sqlalchemy import SQLAlchemy  # connection to PostgreSql database
 # getting this from the Flask-SQLAlchemy helper library
 
+# Example project for full usage demo: https://github.com/code-workshops/blogwise
+from werkzeug.security import generate_password_hash, check_password_hash
+
 db = SQLAlchemy()  # instance of SQLAlchemy
 
 #############################################################################
@@ -14,9 +17,9 @@ class User(db.Model):
 
     __tablename__ = "users"
 
-    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
-    password = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String, nullable=False)
 
     tasks = db.relationship("Task", backref='user')
     # user.tasks returns list of tasks
@@ -46,6 +49,21 @@ class User(db.Model):
 
         return cls.query.filter_by(username=username).one()
 
+    def save(self):
+        """A method to make saving users simpler."""
+        db.session.add(self)
+        db.session.commit()
+    
+    def create_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def is_valid_password(self, password):
+        return check_password_hash(self.password, password)
+
+    def change_password(self, old, new):
+        if self.is_valid_password(old):
+            self.create_password(new)
+            self.save()
 
 class Setting(db.Model):
     """List of all settings."""
@@ -207,7 +225,7 @@ def connect_to_db(app):
     """Connect the database to the Flask app."""
 
     # Configure to use PostgresSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///mindfulmornings'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///mindfulmorning'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)
@@ -218,4 +236,5 @@ if __name__ == "__main__":
 
     from server import app
     connect_to_db(app)
+    db.create_all()
     print("Connected to DB.")

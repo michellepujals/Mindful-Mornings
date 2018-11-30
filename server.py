@@ -18,17 +18,13 @@ app.jinja_env.undefined = StrictUndefined  # Raises error for undefined vars
 @app.route("/")
 def show_index():
     """Show homepage."""
+    user_id = session.get('user')
 
-    if session['user']:
-        user_id = session['user']
+    # Avoid key errors
+    if user_id:
         user = User.query.get(user_id)
-        if user:
-            username = user.username
 
-    else:
-        username = "friend"
-
-    return render_template("index.html", username=username)
+    return render_template("index.html", username=user.username if user else 'friend')
 
 
 @app.route("/register", methods=["GET"])
@@ -42,24 +38,25 @@ def display_registration_form():
 def execute_user_registration():
     """Add new user to database using info provided in registration form."""
 
-    username = request.form.get("username")
-    password = request.form.get("password")
-    confirm_password = request.form.get("confirm_password")
+    pword_conf = request.form.get('passwordConf')
+    password = request.form.get('password')
 
-    if password != confirm_password:
-        flash("Your passwords do not match. Please try again.")
-        return redirect("/register")
+    if password == pword_conf:
+        user = User(name=request.form.get('name'),
+                    email=request.form.get('email'))
+        user.create_password(password)
+        user.save()
+        session['user_id'] = user.id  # auto-login upon registration
 
-    user = User(username=username, password=password)
-    db.session.add(user)
-    db.session.commit()
-
-    user_id = user.user_id  # get new user's user_id (automatically generated)
+        return redirect(f'/user/{user.id}')
+    else:
+        app.logger.info("User signup failed!")
+        flash("Passwords don't match!", 'warning')
 
     settings = Setting.query.all()  # list of all settings objects
 
     for setting in settings:  # going from Settings object -> UserSetting
-        new_user_setting = UserSetting(user_id=user_id,
+        new_user_setting = UserSetting(user_id=user.id,
                                        setting_id=setting.setting_id,
                                        value=setting.setting_default_value)
         db.session.add(new_user_setting)
@@ -71,36 +68,22 @@ def execute_user_registration():
 
 
 @app.route("/login", methods=["POST"])
-def check_login_credentials():
+def login():
     """Check user email and password against the db, add user to session."""
 
-    username = request.form.get("username")  # get username from form
-    password = request.form.get("password")  # get password from form
-    user = User.query.filter_by(username=username).first()  # queries database
-
-    if user:  # if the user exists (if that username exists)
-        if user.password == password:  # check if the password is the same
-            session['user'] = user.user_id  # adds user to the session
-
-            flash("You are now logged in.")
-            return redirect("/")
-        else:
-            flash("Incorrect login information. Please try again.")
-            return redirect("/")
-
-    elif not user:
-        flash("Your username does not exist. Please try again or register as a new user.")
-        return redirect("/")
-
-    return render_template("index.html", username=username, password=password,
-                           user=user)
+    user = User.query.filter_by(username=request.form.get('username')).first_or_404()
+    if user.is_valid_password(request.form.get('password')):
+        session['user_id'] = user.id
+        return redirect('/')
+    else:
+        return render_template('login.html')
 
 
 @app.route("/logout")
 def log_out_user():
     """Log user out."""
 
-    session['user'] = None  # clears the user's data from the session
+    session.clear()  # clears the user's data from the session
     flash("You are now logged out.")
 
     return redirect("/")
@@ -110,10 +93,14 @@ def log_out_user():
 def task_list():
     """Show list of tasks."""  # All task objects for this user
 
-    user_id = session['user']  # get the user_id from the session dictionary
-    tasks = Task.query.filter_by(user_id=user_id).all()  # get list of tasks
+    user_id = session.get('user')
+    if user_id:
+        tasks = Task.query.filter_by(user_id=user_id).all()  # get list of tasks
 
-    return render_template("dashboard.html", tasks=tasks)
+        return render_template("dashboard.html", tasks=tasks)
+    else:
+        flash("You must login!")
+        redirect('/api/tasks')
 
 
 @app.route("/api/task", methods=["POST"])
