@@ -53,7 +53,7 @@ class EditableText extends React.Component {
     const input = (
       <input
         className="editable-text"
-        autofocus
+        autoFocus
         type="text"
         value={value}
         onChange={this.handleInputChange}
